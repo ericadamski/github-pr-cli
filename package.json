@@ -1,0 +1,22 @@
+{
+  "name": "github-pr-cli",
+  "version": "1.0.0",
+  "description": "A way to review Github pull requests on the command line",
+  "main": "index.js",
+  "repository": "git@github.com:ericadamski/github-pr-cli.git",
+  "author": "Eric Adamski <er.adamski@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "test": "jest"
+  },
+  "dependencies": {
+    "blessed": "^0.1.81",
+    "github-oauth-prompt": "^1.1.0",
+    "opn-url": "^1.0.1",
+    "rxjs": "^5.5.6"
+  },
+  "devDependencies": {
+    "jest": "^22.4.2",
+    "prettier": "^1.10.2"
+  }
+}
