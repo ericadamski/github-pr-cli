@@ -1,7 +1,9 @@
 const fs = require("fs");
 const { Observable } = require("rxjs");
+const { removeToken } = require("../helpers/helpers");
+const { ROOT_DIR, TOKEN_LOCATION } = require("../helpers/constants");
 
-const { isAuthorized, ROOT_DIR } = require("../is-authorized");
+const { isAuthorized } = require("../is-authorized");
 
 describe(".isAuthorized", () => {
   it("should be a function with arity 0", () => {
@@ -12,8 +14,10 @@ describe(".isAuthorized", () => {
 
   it("should return an Observable of the token if authorized", () => {
     // Arrange
+    const token = "token";
     fs.rmdirSync(ROOT_DIR);
     fs.mkdirSync(ROOT_DIR);
+    fs.writeFileSync(TOKEN_LOCATION, token);
 
     // Act
     const result$ = isAuthorized();
@@ -21,14 +25,16 @@ describe(".isAuthorized", () => {
     // Assert
     expect(result$ instanceof Observable).toBeTruthy();
 
-    return result$.toPromise().then(token => {
-      expect(token).not.toBeUndefined();
-      expect(typeof token).toBe("string");
-      // fs.unlinkSync(TOKEN_LOCATION);
+    return result$.toPromise().then(t => {
+      expect(t).not.toBeUndefined();
+      expect(typeof t).toBe("string");
+      expect(t).toEqual(token);
+
+      return removeToken().toPromise();
     });
   });
 
-  it("should return on Observable of undefined otherwise", () => {
+  it("should return on Observable of false otherwise", () => {
     // Act
     const result$ = isAuthorized();
 
@@ -36,7 +42,7 @@ describe(".isAuthorized", () => {
     expect(result$ instanceof Observable).toBeTruthy();
 
     return result$.toPromise().then(token => {
-      expect(token).toBeUndefined();
+      expect(token).toBeFalsy();
     });
   });
 });

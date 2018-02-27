@@ -9,6 +9,8 @@ require("rxjs/add/operator/partition");
 const access = Observable.bindNodeCallback(fs.access);
 const mkdir = Observable.bindNodeCallback(fs.mkdir);
 const writeFile = Observable.bindNodeCallback(fs.writeFile);
+const readFile = Observable.bindNodeCallback(fs.readFile);
+const unlink = Observable.bindNodeCallback(fs.unlink);
 
 const { ROOT_DIR, TOKEN_LOCATION } = require("./constants");
 
@@ -27,18 +29,22 @@ function writeToken(token) {
   );
 }
 
-function readToken() {}
+function readToken() {
+  return readFile(TOKEN_LOCATION, { encoding: "utf8" }).catch(
+    err => err && Observable.of(false)
+  );
+}
 
-function removeToken() {}
+function removeToken() {
+  return access(TOKEN_LOCATION)
+    .catch(err => err && Observable.of(undefined))
+    .switchMap(() => unlink(TOKEN_LOCATION));
+}
 
 function doesTokenDirectoryExist() {
   return access(ROOT_DIR)
     .mapTo(true)
-    .catch(err => {
-      if (process.env.NODE_ENV === "test") console.error(err);
-
-      return err && Observable.of(false);
-    });
+    .catch(err => err && Observable.of(false));
 }
 
 module.exports = {

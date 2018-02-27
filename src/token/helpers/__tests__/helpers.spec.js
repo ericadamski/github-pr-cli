@@ -9,9 +9,15 @@ const {
   doesTokenDirectoryExist
 } = require("../helpers");
 
+const noop = () => null;
+
 describe("helpers", () => {
   describe(".doesTokenDirectoryExist", () => {
-    afterAll(() => fs.rmdirSync(ROOT_DIR));
+    afterAll(() =>
+      removeToken()
+        .toPromise()
+        .then(() => fs.rmdirSync(ROOT_DIR))
+    );
 
     it("should be a function with arity 0", () => {
       // Assert
@@ -19,10 +25,10 @@ describe("helpers", () => {
       expect(doesTokenDirectoryExist).toHaveLength(0);
     });
 
-    it("should return an Observable of false if the directory does NOT exists", () => {
+    it("should return an Observable of false if the directory does NOT exists", async () => {
       // Arrange
       try {
-        fs.access(ROOT_DIR);
+        fs.accessSync(ROOT_DIR);
         fs.rmdirSync(ROOT_DIR);
       } catch (e) {
         // nohting the directory already doesn't exist.
@@ -39,7 +45,11 @@ describe("helpers", () => {
 
     it("should return an Observable of true if the directory does exists", () => {
       // Arrange
-      fs.mkdirSync(ROOT_DIR);
+      try {
+        fs.accessSync(ROOT_DIR);
+      } catch (e) {
+        fs.mkdirSync(ROOT_DIR);
+      }
 
       // Act
       const result$ = doesTokenDirectoryExist();
@@ -118,14 +128,35 @@ describe("helpers", () => {
   });
 
   describe(".removeToken", () => {
-    it("should be a function with arity 1", () => {
+    it("should be a function with arity 0", () => {
       // Assert
       expect(typeof removeToken).toBe("function");
-      expect(removeToken).toHaveLength(1);
+      expect(removeToken).toHaveLength(0);
     });
 
-    it("should unlink the file", () => {
+    it("should unlink the file", async () => {
       // Arrange
+      const token = "some token";
+      await writeToken(token).toPromise();
+
+      // Act
+      const result$ = removeToken();
+
+      // Assert
+      expect(result$ instanceof Observable).toBeTruthy();
+
+      return result$
+        .toPromise()
+        .then(
+          () =>
+            new Promise((resolve, reject) =>
+              fs.access(TOKEN_LOCATION, err => (err ? reject(err) : resolve()))
+            )
+        )
+        .then(() => fail("File should not exist."))
+        .catch(e =>
+          expect(e.message.includes("no such file or directory")).toBeTruthy()
+        );
     });
   });
 });
