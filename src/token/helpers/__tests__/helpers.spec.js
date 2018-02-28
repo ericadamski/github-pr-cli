@@ -1,7 +1,8 @@
 const { Observable } = require("rxjs");
+const { EOL } = require("os");
 const fs = require("fs");
 
-const { ROOT_DIR, TOKEN_LOCATION } = require("../constants");
+const { ROOT_DIR, TOKEN_LOCATION } = require("../../../constants");
 const {
   writeToken,
   readToken,
@@ -122,7 +123,7 @@ describe("helpers", () => {
 
       return result$.toPromise().then(t => {
         expect(t).not.toBeUndefined();
-        expect(t).toEqual(token);
+        expect(t).toEqual(`${token}${EOL}`);
       });
     });
   });

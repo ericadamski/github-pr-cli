@@ -1,3 +1,4 @@
+const { EOL } = require("os");
 const fs = require("fs");
 const { Observable } = require("rxjs/Observable");
 require("rxjs/add/observable/bindNodeCallback");
@@ -12,10 +13,12 @@ const writeFile = Observable.bindNodeCallback(fs.writeFile);
 const readFile = Observable.bindNodeCallback(fs.readFile);
 const unlink = Observable.bindNodeCallback(fs.unlink);
 
-const { ROOT_DIR, TOKEN_LOCATION } = require("./constants");
+const { ROOT_DIR, TOKEN_LOCATION } = require("../../constants");
 
 function writeTokenToFile(source$, token) {
-  return source$.switchMap(() => writeFile(TOKEN_LOCATION, token)).mapTo(token);
+  return source$
+    .switchMap(() => writeFile(TOKEN_LOCATION, `${token}${EOL}`))
+    .mapTo(token);
 }
 
 function writeToken(token) {

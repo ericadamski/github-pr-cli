@@ -1,7 +1,7 @@
 const fs = require("fs");
 const { Observable } = require("rxjs");
 const { removeToken } = require("../helpers/helpers");
-const { ROOT_DIR, TOKEN_LOCATION } = require("../helpers/constants");
+const { ROOT_DIR, TOKEN_LOCATION } = require("../../constants");
 
 const { isAuthorized } = require("../is-authorized");
 

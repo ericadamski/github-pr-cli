@@ -16,6 +16,7 @@ module.exports = function installCommandBar(parent) {
     width: "100%",
     height: "40%",
     border: "line",
+    scrollable: true,
     style: {
       fg: "default",
       bg: "default",
